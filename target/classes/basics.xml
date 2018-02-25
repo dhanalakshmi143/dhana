@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
+    <flow name="basicsFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/prop" allowedMethods="Get" doc:name="HTTP"/>
+        <set-property propertyName="Name" value="#[message.inboundProperties.'http.query.params'.Name]" doc:name="Property"/>
+        <set-property propertyName="Age" value="#[message.inboundProperties.'http.query.params'.Age]" doc:name="Property"/>
+        <set-payload value=" Name: #[message.outboundProperties.Name] Age: #[message.outboundProperties.Age&gt;=18]" doc:name="Set Payload"/>
+        <logger level="INFO" doc:name="Logger" message="#[payload]"/>
+    </flow>
+    <flow name="basicsFlow2">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/svar" allowedMethods="Get" doc:name="HTTP"/>
+        <set-session-variable variableName="AccountName" value="#[message.inboundProperties.'http.query.params'.AccountName]" doc:name="Session Variable"/>
+        <set-session-variable variableName="AccountNumber" value="#[message.inboundProperties.'http.query.params'.AccountNumber]" doc:name="Session Variable"/>
+        <set-payload value="AccountName: #[sessionVars.AccountName]
+AccountNumber: #[sessionVars.AccountNumber]" doc:name="Set Payload"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+    </flow>
+    <flow name="basicsFlow1">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/var" allowedMethods="Get" doc:name="HTTP"/>
+        <set-variable variableName="id" value="#[message.inboundProperties.'http.query.params'.id]" doc:name="Variable"/>
+        <set-variable variableName="Accountname" value="#[message.inboundProperties.'http.query.params'.Accountname]" doc:name="Variable"/>
+        <set-payload value="ID: #[flowVars.id] AccountName: #[flowVars.Accountname]" doc:name="Set Payload"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+    </flow>
+</mule>
